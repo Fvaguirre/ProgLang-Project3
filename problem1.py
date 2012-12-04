@@ -5,7 +5,7 @@ import os
 import re
 
 #remove all between /* and */
-rm_comment1='\/\*(.*?)\*\/'
+rm_comment1='\/\*(.*?)\*\/' #multi-line comments
 #rm_comment2=
 
 # Argument count sanity check
@@ -32,7 +32,7 @@ for root, dirs, files in os.walk(sys.argv[1]):
 			dirsize += os.path.getsize(os.path.join(root,file_target))
 			# open file
 			infile = open(os.path.join(root,file_target), "r")
-			rm-one-line-comment - re.compile('^.*?#')
+			rm-one-line-comment - re.compile('^.*?//') #single-line comment
 
 
 
