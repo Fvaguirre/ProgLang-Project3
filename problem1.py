@@ -32,13 +32,16 @@ for root, dirs, files in os.walk(sys.argv[1]):
             dirsize += os.path.getsize(os.path.join(root,file_target))
             # open file
             infile = open(os.path.join(root,file_target), "r")
-            rm-one-line-comment - re.compile('^.*?//') #single-line comment
+            regex-oneliners = re.compile('^.*?//') #single-line comment
         #end if
     #end for
 
-
-#	print dirsize
-    print d_count_public
+    #print everything
+    print (root + " bytes\t"
+            + d_count_public + " public\t"
+            + d_count_private + " private\t"
+            + d_count_try + " try\t"
+            + d_count_catch + " catch\t")
 #end for
 
 
