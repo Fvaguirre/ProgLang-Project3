@@ -10,7 +10,7 @@ rm_comment1='\/\*(.*?)\*\/' #multi-line comments
 
 def get_dirsize(src_path = "."):
     accumulator = 0
-    #walk the tree, counting sizes
+    #walk the tree, counting sizes. this could probably also be done recursively below...
     for root,dirs,files in os.walk(src_path):
         for f in files:
             path = os.path.join(root,f)
@@ -28,7 +28,7 @@ def remove_comments(path_to_file):
     infile = open(path_to_file,"r") # open the input file
     for inline in infile:
         file_as_string += re.sub(rm_one_line_comment,"",inline) # Read input file into a string, stripping single line comments
-        file_sans_newlines = re.sub(rm_newline," ",file_as_string)  # Remove whitespace characters
+        file_sans_newlines = re.sub(rm_newline," ",file_as_string)  # Remove newline characters
         file_as_string = re.sub(rm_multiline_comment,"",file_sans_newlines) # remove multiline comments
     infile.close()  # clean up
     return file_as_string   # its over!
@@ -42,26 +42,24 @@ def processDirectory(directory,out_list):
     d_count_catch = 0
     dirsize = 0
 
-    #absolute paths are requiredish
-    #directory = os.path.abspath(directory)
-    fileList = os.listdir(directory)
+    fileList = os.listdir(directory)                    #get all files (this includes subdirectories)
 
     for f in fileList:
-        curFile = os.path.join(directory,f)
+        curFile = os.path.join(directory,f)             #get file path
 
-        if os.path.isfile(curFile):
-            name,ext = os.path.splitext(curFile)
+        if os.path.isfile(curFile):                     #if we have a file, scan it for keywords
+            name,ext = os.path.splitext(curFile)        #check extension
             if ext == str('.java'):
                 strip_string = remove_comments(curFile)
-                #re.findall returns a list of all matches, use the length of that list to count matches
+                #re.findall returns a list of all matches, the length of that list then counts matches
                 d_count_public += len(re.findall('public', strip_string))
                 d_count_private += len(re.findall('private', strip_string))
                 d_count_try += len(re.findall('try', strip_string))
                 d_count_catch += len(re.findall('catch', strip_string))
             #endif
         #endif
-        else:       #must be a directory
-            (sub_public,sub_private,sub_try,sub_catch) = processDirectory(curFile,out_list) #get stats from the subdirectory and accumulate them here
+        else:       #must be a directory, if not a file
+            (sub_public,sub_private,sub_try,sub_catch) = processDirectory(curFile,out_list) #recursively get stats from the subdirectory and accumulate them here
             d_count_public += sub_public
             d_count_private += sub_private
             d_count_try += sub_try
@@ -71,15 +69,15 @@ def processDirectory(directory,out_list):
         dirsize = get_dirsize(directory) 
 
     
-    out_str = (directory + ":\n\t"
+    out_str = (directory + ":\n\t"                  #form an output string, but we don't print it yet
             + str(dirsize) + " bytes\t"
             + str(d_count_public) + " public\t"
             + str(d_count_private) + " private\t"
             + str(d_count_try) + " try\t"
             + str(d_count_catch) + " catch\t")
 
-    out_list.insert(0,out_str)      #write output into out_list for reordering later
-    return (d_count_public,d_count_private,d_count_try,d_count_catch)
+    out_list.insert(0,out_str)                      #prepend output string to beginnign of output list, to print later
+    return (d_count_public,d_count_private,d_count_try,d_count_catch)   #return subdirectory statistics to caller
 #end def
 
 
@@ -97,46 +95,9 @@ def main():
 
     processDirectory(sys.argv[1],out_list)
 
-    for i in sorted(out_list):
+    for i in out_list:
         print i
-    
-    # Walk through all directories and subdirectories, starting with argv[1]
-    #for root, dirs, files in os.walk(sys.argv[1]):
-    #    # reset counts for each statistic
-    #    dirsize = 0
-    #    d_count_public = 0
-    #    d_count_private = 0
-    #    d_count_try = 0
-    #    d_count_catch = 0
-    #
-    #    # look at all files
-    #    for file_target in files:
-    #        # determine file extention
-    #        name, ext = os.path.splitext(file_target)
-    #        # if its a java file, get file statistics
-    #        if ext == str('.java'):
-    #            # open file
-    #            #infile = open(os.path.join(root,file_target), "r")
-    #            #regex_oneliners = re.compile('^.*?//') #single-line comment
-    #            strip_string = remove_comments(os.path.join(root,file_target))
-    #            #re.findall returns a list of all matches, use the length of that list to count matches
-    #            d_count_public += len(re.findall('public', strip_string))
-    #            d_count_private += len(re.findall('private', strip_string))
-    #            d_count_try += len(re.findall('try', strip_string))
-    #            d_count_catch += len(re.findall('catch', strip_string))
-
-    #        #end if
-    #    #end for
-    #
-    #    dirsize = get_dirsize(root)
-    #
-    #    #print everything
-    #    print (root + ":\n\t"
-    #            + str(dirsize) + " bytes\t"
-    #            + str(d_count_public) + " public\t"
-    #            + str(d_count_private) + " private\t"
-    #            + str(d_count_try) + " try\t"
-    #            + str(d_count_catch) + " catch\t")
+        print "---------------------------"
     #end for
 #end def
 
