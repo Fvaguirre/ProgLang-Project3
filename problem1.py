@@ -18,6 +18,22 @@ def get_dirsize(src_path = "."):
     return accumulator
 #end def
 
+def remove_comments(path_to_file):
+    # regex for ease of reading
+    rm_one_line_comment = re.compile('//.*')            # match single-line comment
+    rm_multiline_comment = re.compile('\/\*(.*?)\*\/')  # match multiline comment
+    rm_newline = re.compile('\s')                       # match newline character
+
+    file_as_string = "" # Set string to be empty
+    infile = open(path_to_file,"r") # open the input file
+    for inline in infile:
+        file_as_string += re.sub(rm_one_line_comment,"",inline) # Read input file into a string, stripping single line comments
+        file_sans_newlines = re.sub(rm_newline," ",file_as_string)  # Remove whitespace characters
+        file_as_string = re.sub(rm_multiline_comment,"",file_sans_newlines) # remove multiline comments
+    infile.close()  # clean up
+    return file_as_string   # its over!
+#end def
+
 def main():
     # Argument count sanity check
     if len(sys.argv) != 2:
