@@ -8,6 +8,15 @@ import re
 rm_comment1='\/\*(.*?)\*\/' #multi-line comments
 #rm_comment2=
 
+def get_dirsize(src_path = "."):
+    accumulator = 0
+    for root,dirs,files in os.walk(src_path):
+        for f in files:
+            path = os.path.join(root,f)
+            accumulator += os.path.getsize(path)
+    return accumulator
+#end def
+
 # Argument count sanity check
 if len(sys.argv) != 2:
     print 'Error: Must only pass one directory.'
@@ -28,20 +37,21 @@ for root, dirs, files in os.walk(sys.argv[1]):
         name, ext = os.path.splitext(file_target)
         # if its a java file, get file statistics
         if ext == str('.java'):
-            # add the size of this file to the dirsize
-            dirsize += os.path.getsize(os.path.join(root,file_target))
             # open file
             infile = open(os.path.join(root,file_target), "r")
-            regex-oneliners = re.compile('^.*?//') #single-line comment
+            regex_oneliners = re.compile('^.*?//') #single-line comment
         #end if
     #end for
 
+    dirsize = get_dirsize(root)
+
     #print everything
-    print (root + " bytes\t"
-            + d_count_public + " public\t"
-            + d_count_private + " private\t"
-            + d_count_try + " try\t"
-            + d_count_catch + " catch\t")
+    print (root + ":\n\t"
+            + str(dirsize) + " bytes\t"
+            + str(d_count_public) + " public\t"
+            + str(d_count_private) + " private\t"
+            + str(d_count_try) + " try\t"
+            + str(d_count_catch) + " catch\t")
 #end for
 
 
