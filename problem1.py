@@ -34,49 +34,109 @@ def remove_comments(path_to_file):
     return file_as_string   # its over!
 #end def
 
-def main():
-    # Argument count sanity check
-    if len(sys.argv) != 2:
-        print 'Error: Must only pass one directory.'
-        sys.exit()
+def processDirectory(directory,out_list):
     
-    # Walk through all directories and subdirectories, starting with argv[1]
-    for root, dirs, files in os.walk(sys.argv[1]):
-        # reset counts for each statistic
-        dirsize = 0
-        d_count_public = 0
-        d_count_private = 0
-        d_count_try = 0
-        d_count_catch = 0
-    
-        # look at all files
-        for file_target in files:
-            # determine file extention
-            name, ext = os.path.splitext(file_target)
-            # if its a java file, get file statistics
+    d_count_public = 0
+    d_count_private = 0
+    d_count_try = 0
+    d_count_catch = 0
+    dirsize = 0
+
+    #absolute paths are requiredish
+    #directory = os.path.abspath(directory)
+    fileList = os.listdir(directory)
+
+    for f in fileList:
+        curFile = os.path.join(directory,f)
+
+        if os.path.isfile(curFile):
+            name,ext = os.path.splitext(curFile)
             if ext == str('.java'):
-                # open file
-                #infile = open(os.path.join(root,file_target), "r")
-                #regex_oneliners = re.compile('^.*?//') #single-line comment
-                strip_string = remove_comments(os.path.join(root,file_target))
+                strip_string = remove_comments(curFile)
                 #re.findall returns a list of all matches, use the length of that list to count matches
                 d_count_public += len(re.findall('public', strip_string))
                 d_count_private += len(re.findall('private', strip_string))
                 d_count_try += len(re.findall('try', strip_string))
                 d_count_catch += len(re.findall('catch', strip_string))
+            #endif
+        #endif
+        else:       #must be a directory
+            (sub_public,sub_private,sub_try,sub_catch) = processDirectory(curFile,out_list) #get stats from the subdirectory and accumulate them here
+            d_count_public += sub_public
+            d_count_private += sub_private
+            d_count_try += sub_try
+            d_count_catch += sub_catch
+        #end else
 
-            #end if
-        #end for
+        dirsize = get_dirsize(directory) 
+
     
-        dirsize = get_dirsize(root)
+    out_str = (directory + ":\n\t"
+            + str(dirsize) + " bytes\t"
+            + str(d_count_public) + " public\t"
+            + str(d_count_private) + " private\t"
+            + str(d_count_try) + " try\t"
+            + str(d_count_catch) + " catch\t")
+
+    out_list.insert(0,out_str)      #write output into out_list for reordering later
+    return (d_count_public,d_count_private,d_count_try,d_count_catch)
+#end def
+
+
+
+
+
+
+def main():
+    # Argument count sanity check
+    if len(sys.argv) != 2:
+        print 'Error: Must only pass one directory.'
+        sys.exit()
+
+    out_list = []
+
+    processDirectory(sys.argv[1],out_list)
+
+    for i in sorted(out_list):
+        print i
     
-        #print everything
-        print (root + ":\n\t"
-                + str(dirsize) + " bytes\t"
-                + str(d_count_public) + " public\t"
-                + str(d_count_private) + " private\t"
-                + str(d_count_try) + " try\t"
-                + str(d_count_catch) + " catch\t")
+    # Walk through all directories and subdirectories, starting with argv[1]
+    #for root, dirs, files in os.walk(sys.argv[1]):
+    #    # reset counts for each statistic
+    #    dirsize = 0
+    #    d_count_public = 0
+    #    d_count_private = 0
+    #    d_count_try = 0
+    #    d_count_catch = 0
+    #
+    #    # look at all files
+    #    for file_target in files:
+    #        # determine file extention
+    #        name, ext = os.path.splitext(file_target)
+    #        # if its a java file, get file statistics
+    #        if ext == str('.java'):
+    #            # open file
+    #            #infile = open(os.path.join(root,file_target), "r")
+    #            #regex_oneliners = re.compile('^.*?//') #single-line comment
+    #            strip_string = remove_comments(os.path.join(root,file_target))
+    #            #re.findall returns a list of all matches, use the length of that list to count matches
+    #            d_count_public += len(re.findall('public', strip_string))
+    #            d_count_private += len(re.findall('private', strip_string))
+    #            d_count_try += len(re.findall('try', strip_string))
+    #            d_count_catch += len(re.findall('catch', strip_string))
+
+    #        #end if
+    #    #end for
+    #
+    #    dirsize = get_dirsize(root)
+    #
+    #    #print everything
+    #    print (root + ":\n\t"
+    #            + str(dirsize) + " bytes\t"
+    #            + str(d_count_public) + " public\t"
+    #            + str(d_count_private) + " private\t"
+    #            + str(d_count_try) + " try\t"
+    #            + str(d_count_catch) + " catch\t")
     #end for
 #end def
 
