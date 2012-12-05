@@ -15,7 +15,7 @@ if len(sys.argv) != 2:
 
 # Recurse through all directories and subdirectories, starting with argv[1]
 for root, dirs, files in os.walk(sys.argv[1]):
-	# reset counts for each statistic
+    # reset counts for each statistic
     dirsize = 0
     d_count_public = 0
     d_count_private = 0
