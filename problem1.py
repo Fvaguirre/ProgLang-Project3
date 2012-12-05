@@ -40,7 +40,7 @@ def main():
         print 'Error: Must only pass one directory.'
         sys.exit()
     
-    # Recurse through all directories and subdirectories, starting with argv[1]
+    # Walk through all directories and subdirectories, starting with argv[1]
     for root, dirs, files in os.walk(sys.argv[1]):
         # reset counts for each statistic
         dirsize = 0
@@ -56,8 +56,15 @@ def main():
             # if its a java file, get file statistics
             if ext == str('.java'):
                 # open file
-                infile = open(os.path.join(root,file_target), "r")
-                regex_oneliners = re.compile('^.*?//') #single-line comment
+                #infile = open(os.path.join(root,file_target), "r")
+                #regex_oneliners = re.compile('^.*?//') #single-line comment
+                strip_string = remove_comments(os.path.join(root,file_target))
+                #re.findall returns a list of all matches, use the length of that list to count matches
+                d_count_public += len(re.findall('public', strip_string))
+                d_count_private += len(re.findall('private', strip_string))
+                d_count_try += len(re.findall('try', strip_string))
+                d_count_catch += len(re.findall('catch', strip_string))
+
             #end if
         #end for
     
