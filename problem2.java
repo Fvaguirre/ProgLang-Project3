@@ -17,6 +17,7 @@ class InvalidTransactionError extends Error {}
 
 // TO DO: you are not permitted to modify class Account
 //
+// BEGIN DO NOT MODIFY SECTION
 class Account {
     private int value = 0;
     private Thread writer = null;
@@ -133,6 +134,7 @@ class Account {
         System.out.print(val);
     }
 }
+// END DO NOT MODIFY SECTION
 
 // TO DO: Worker is currently an ordinary class.
 // You will need to movify it to make it a task,
