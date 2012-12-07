@@ -1,7 +1,6 @@
 import java.io.*;
 import java.lang.Thread.*;
 import java.util.HashSet;
-import java.util.concurrent;
 
 class constants {
     public static final int A = 0;
@@ -18,7 +17,6 @@ class InvalidTransactionError extends Error {}
 
 // TO DO: you are not permitted to modify class Account
 //
-// BEGIN DO NOT MODIFY SECTION
 class Account {
     private int value = 0;
     private Thread writer = null;
@@ -135,7 +133,6 @@ class Account {
         System.out.print(val);
     }
 }
-// END DO NOT MODIFY SECTION
 
 // TO DO: Worker is currently an ordinary class.
 // You will need to movify it to make it a task,
@@ -228,7 +225,6 @@ public class Server {
     private static final int Z = constants.Z;
     private static final int numLetters = constants.numLetters;
     private static Account[] accounts;
-//    private Executor e = Excutors.newFixedThreadPool(1);
 
     private static void dumpAccounts() {
         // output values:
@@ -260,6 +256,7 @@ public class Server {
 // following loop to feed tasks to the executor instead of running them
 // directly.  Don't modify the initialization of accounts above, or the
 // output at the end.
+
         while ((line = input.readLine()) != null) {
             Worker w = new Worker(accounts, line);
             w.run();
