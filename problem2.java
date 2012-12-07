@@ -226,6 +226,7 @@ public class problem2 {
     private static final int Z = constants.Z;
     private static final int numLetters = constants.numLetters;
     private static Account[] accounts;
+    private static Executor e = Executors.newSingleThreadExecutor();
 
     private static void dumpAccounts() {
         // output values:
