@@ -170,18 +170,18 @@ class Worker {
     // You probably want to change it to return a reference to an
     // account *cache* instead.
     //
-    private Account parseAccount(String name) {
+    private int parseAccount(String name) {
         int accountNum = (int) (name.charAt(0)) - (int) 'A';
         if (accountNum < A || accountNum > Z)
             throw new InvalidTransactionError();
-        Account a = accounts[accountNum];
+//        Account a = accounts[accountNum];
         for (int i = 1; i < name.length(); i++) {
             if (name.charAt(i) != '*')
                 throw new InvalidTransactionError();
             accountNum = (accounts[accountNum].peek() % numLetters);
-            a = accounts[accountNum];
+//            a = accounts[accountNum];
         }
-        return a;
+        return accountNum;
     }
 
     private int parseAccountOrNum(String name) {
@@ -189,7 +189,7 @@ class Worker {
         if (name.charAt(0) >= '0' && name.charAt(0) <= '9') {
             rtn = new Integer(name).intValue();
         } else {
-            rtn = parseAccount(name).peek();
+            rtn = parseAccount(name);
         }
         return rtn;
     }
@@ -199,13 +199,22 @@ class Worker {
         String[] commands = transaction.split(";");
 
         for (int i = 0; i < commands.length; i++) {
+
             String[] words = commands[i].trim().split("\\s");
+
             if (words.length < 3)
                 throw new InvalidTransactionError();
-            Account lhs = parseAccount(words[0]);
+
+            int lhs = parseAccount(words[0]);
+            // cache the current value of lhs
+            cache[lhs] = accounts[lhs].peek();
+            isRead[lhs] = true;
+
             if (!words[1].equals("="))
                 throw new InvalidTransactionError();
+
             int rhs = parseAccountOrNum(words[2]);
+
             for (int j = 3; j < words.length; j+=2) {
                 if (words[j].equals("+"))
                     rhs += parseAccountOrNum(words[j+1]);
@@ -214,14 +223,17 @@ class Worker {
                 else
                     throw new InvalidTransactionError();
             }
-            try {
-                lhs.open(true);
-            } catch (TransactionAbortException e) {
+
+//            try {
+//                lhs.open(true);
+//            } catch (TransactionAbortException e) {
                 // won't happen in sequential version
-            }
-            lhs.update(rhs);
-            lhs.close();
+//            }
+
+//            lhs.update(rhs);
+//            lhs.close();
         }
+
         System.out.println("commit: " + transaction);
     }
 }
