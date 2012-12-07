@@ -220,7 +220,7 @@ class Worker {
     }
 }
 
-public class Server {
+public class problem2 {
     private static final int A = constants.A;
     private static final int Z = constants.Z;
     private static final int numLetters = constants.numLetters;
