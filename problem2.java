@@ -147,6 +147,11 @@ class Worker {
     private Account[] accounts;
     private String transaction;
 
+    // Caches
+    private boolean[] isOpen = new boolean[26];
+    private boolean[] isRead = new boolean[26];
+    private int[] cache = new int[26];
+
     // TO DO: The sequential version of Worker peeks at accounts
     // whenever it needs to get a value, and opens, updates, and closes
     // an account whenever it needs to set a value.  This won't work in
