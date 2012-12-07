@@ -274,7 +274,7 @@ public class problem2 {
             e.execute(task);
         }
 
-        // nicely request a shutdown of the pool
+        // nicely request a shutdown of the thread pool
         e.shutdown();
 
         // wait for all tasks to terminate
@@ -290,6 +290,7 @@ public class problem2 {
             // (Re-)Cancel if current thread also interrupted
             e.shutdownNow();
         }
+        // All tasks completed
 
         System.out.println("final values:");
         dumpAccounts();
