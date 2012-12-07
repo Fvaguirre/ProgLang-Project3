@@ -270,7 +270,7 @@ public class problem2 {
                         Worker w = new Worker(accounts, passLine);
                         w.run();
                     } catch (InvalidTransactionError ite) {
-
+                        System.err.println("Error: transation '" + passLine + "'is invalid, aborting this transaction");
                     }
                 }
             };
