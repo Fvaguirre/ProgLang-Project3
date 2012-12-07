@@ -256,18 +256,11 @@ public class Server {
 // following loop to feed tasks to the executor instead of running them
 // directly.  Don't modify the initialization of accounts above, or the
 // output at the end.
-
-
-// Our code goes here
-
-//End our code
-
-/*  The old while loop
         while ((line = input.readLine()) != null) {
             Worker w = new Worker(accounts, line);
             w.run();
         }
-*/
+
         System.out.println("final values:");
         dumpAccounts();
     }
