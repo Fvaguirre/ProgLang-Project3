@@ -266,8 +266,12 @@ public class problem2 {
             // magic
             Runnable task = new Runnable() {
                 public void run() {
-                    Worker w = new Worker(accounts, passLine);
-                    w.run();
+                    try {
+                        Worker w = new Worker(accounts, passLine);
+                        w.run();
+                    } catch (InvalidTransactionError ite) {
+
+                    }
                 }
             };
             // execute this task
