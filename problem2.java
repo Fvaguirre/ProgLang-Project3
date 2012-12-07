@@ -226,7 +226,7 @@ public class problem2 {
     private static final int Z = constants.Z;
     private static final int numLetters = constants.numLetters;
     private static Account[] accounts;
-    private static Executor e = Executors.newSingleThreadExecutor();
+    private static ExecutorService e = Executors.newSingleThreadExecutor();
 
     private static void dumpAccounts() {
         // output values:
@@ -259,9 +259,36 @@ public class problem2 {
 // directly.  Don't modify the initialization of accounts above, or the
 // output at the end.
 
+        // Start all tasks
         while ((line = input.readLine()) != null) {
-            Worker w = new Worker(accounts, line);
-            w.run();
+            // need this to pass the line into magic internal class
+            final String passLine = line;
+            // magic
+            Runnable task = new Runnable() {
+                public void run() {
+                    Worker w = new Worker(accounts, passLine);
+                    w.run();
+                }
+            };
+            // execute this task
+            e.execute(task);
+        }
+
+        // nicely request a shutdown of the pool
+        e.shutdown();
+
+        // wait for all tasks to terminate
+        try {
+            // Wait a while for existing tasks to terminate
+            if (!e.awaitTermination(2,TimeUnit.MINUTES)) {
+                e.shutdownNow(); // Cancel currently executing tasks
+                // Wait a while for tasks to respond to being cancelled
+                if (!e.awaitTermination(60, TimeUnit.SECONDS))
+                    System.err.println("Error: Executor did not terminate");
+            }
+        } catch (InterruptedException ie) {
+            // (Re-)Cancel if current thread also interrupted
+            e.shutdownNow();
         }
 
         System.out.println("final values:");
