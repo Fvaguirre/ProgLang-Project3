@@ -226,7 +226,7 @@ class Worker {
 
 //            try {
 //                lhs.open(true);
-//            } catch (TransactionAbortException e) {
+//            } catch (TransactionAbortException e) {t
                 // won't happen in sequential version
 //            }
 
