@@ -8,7 +8,7 @@ problem2:
 	javac problem2.java
 
 server: 
-	javac server.java
+	javac Server.java
 
 clean:
 	rm -f ./*.class
