@@ -262,8 +262,15 @@ class Worker {
                         }
                     }
                 } catch (TransactionAbortException e) {
-                    System.out.println("Transaction Aborts");
                     transaction_abort = 1;
+                     // close all open files
+                    for (int foo = 0; i < 26; i++) {
+                        if (isOpen[i] == true) {
+                            accounts[i].close();
+                            isOpen[i] = false;
+                        }
+                    }
+                    System.out.println("Transaction Aborts");
                     // won't happen in sequential version
                 }
 //            }
@@ -294,8 +301,8 @@ public class problem2 {
     private static final int Z = constants.Z;
     private static final int numLetters = constants.numLetters;
     private static Account[] accounts;
-//    private static ExecutorService e = Executors.newFixedThreadPool(26);
-    private static ExecutorService e = Executors.newSingleThreadExecutor();
+    private static ExecutorService e = Executors.newFixedThreadPool(26);
+//    private static ExecutorService e = Executors.newSingleThreadExecutor();
 
     private static void dumpAccounts() {
         // output values:
