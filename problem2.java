@@ -213,42 +213,50 @@ class Worker {
             if (words.length < 3)
                 throw new InvalidTransactionError();
 
-            int lhs = parseAccount(words[0]);
-            // cache the current value of lhs
-            isWrite[lhs] = true;
-            read_cache[lhs] = accounts[lhs].peek();
-            isRead[lhs] = true;
+            int transaction_abort = 1;
+            int rhs = 0;
+            int lhs = 0;
+//            while (transaction_abort == 1) {
+                transaction_abort = 0;
+                lhs = parseAccount(words[0]);
+                // cache the current value of lhs
+                isWrite[lhs] = true;
+                read_cache[lhs] = accounts[lhs].peek();
+                isRead[lhs] = true;
 
-            if (!words[1].equals("="))
-                throw new InvalidTransactionError();
-
-            int rhs = parseAccountOrNum(words[2]);
-
-            for (int j = 3; j < words.length; j+=2) {
-                if (words[j].equals("+"))
-                    rhs += parseAccountOrNum(words[j+1]);
-                else if (words[j].equals("-"))
-                    rhs -= parseAccountOrNum(words[j+1]);
-                else
+                if (!words[1].equals("="))
                     throw new InvalidTransactionError();
-            }
 
-            try {
-                for (int foo = 0; i < 26; i++) {
-                    if (isRead[i] == true) {
-                        if (isWrite[i] == true) {
-                            accounts[i].open(true);
-                        } else {
-                            accounts[i].open(false);
-                            accounts[i].verify(read_cache[i]);
-                        }
-                        isOpen[i] = true;
-                    }
+                rhs = parseAccountOrNum(words[2]);
+
+                for (int j = 3; j < words.length; j+=2) {
+                    if (words[j].equals("+"))
+                        rhs += parseAccountOrNum(words[j+1]);
+                    else if (words[j].equals("-"))
+                        rhs -= parseAccountOrNum(words[j+1]);
+                    else
+                        throw new InvalidTransactionError();
                 }
-            } catch (TransactionAbortException e) {
-                System.out.println("Transaction Aborts");
-                // won't happen in sequential version
-            }
+
+                try {
+                    for (int foo = 0; i < 26; i++) {
+                        if (isRead[i] == true) {
+                            if (isWrite[i] == true) {
+                                accounts[i].open(true);
+                            } else {
+                                accounts[i].open(false);
+                                accounts[i].verify(read_cache[i]);
+                            }
+                            isOpen[i] = true;
+                        }
+                    }
+                } catch (TransactionAbortException e) {
+                    System.out.println("Transaction Aborts");
+                    transaction_abort = 1;
+                    // won't happen in sequential version
+                }
+//            }
+
             accounts[lhs].update(rhs);
             for (int foo = 0; i < 26; i++) {
                 if (isOpen[i] == true) {
