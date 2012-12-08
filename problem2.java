@@ -280,18 +280,16 @@ class Worker {
             } catch (TransactionUsageError tue) {
                 System.out.println("Error: The update has failed.");
             }
-            System.out.println("Open Files? " + isOpen[0]);
 
             // close all open files
             for (int foo = 0; foo < 26; foo++) {
-                System.out.println("Open Files? " + isOpen[i]);
+//                System.out.println("Open Files? " + isOpen[i]);
                 if (isOpen[foo] == true) {
                     accounts[foo].close();
                     isOpen[foo] = false;
                     isWrite[foo] = false;
                 }
             }
-            System.out.println("Open Files? " + isOpen[0]);
         }
 
         System.out.println("commit: " + transaction);
