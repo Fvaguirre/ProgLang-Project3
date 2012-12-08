@@ -190,14 +190,18 @@ class Worker {
     }
 
     private int parseAccountOrNum(String name) {
-        int rtn;
+        int rtn = 0;
         if (name.charAt(0) >= '0' && name.charAt(0) <= '9') {
             rtn = new Integer(name).intValue();
         } else {
-            rtn = parseAccount(name);
-            read_cache[rtn] = accounts[rtn].peek();
-            isRead[rtn] = true;
-            rtn = read_cache[rtn];
+            try {
+                rtn = parseAccount(name);
+                read_cache[rtn] = accounts[rtn].peek();
+                isRead[rtn] = true;
+                rtn = read_cache[rtn];
+            } catch (TransactionUsageError tue) { 
+                System.out.println("Error: peek in parseAccountOrNum failed");
+            }
         }
         return rtn;
     }
@@ -220,9 +224,14 @@ class Worker {
                 transaction_abort = 0;
                 lhs = parseAccount(words[0]);
                 // cache the current value of lhs
-                isWrite[lhs] = true;
-                read_cache[lhs] = accounts[lhs].peek();
-                isRead[lhs] = true;
+
+                try {
+                    isWrite[lhs] = true;
+                    read_cache[lhs] = accounts[lhs].peek();
+                    isRead[lhs] = true;
+                } catch (TransactionUsageError tue) { 
+                    System.out.println("Error: peek on the lhs failed");
+                }
 
                 if (!words[1].equals("="))
                     throw new InvalidTransactionError();
@@ -257,7 +266,12 @@ class Worker {
                 }
 //            }
 
-            accounts[lhs].update(rhs);
+            try {
+                accounts[lhs].update(rhs);
+            } catch (TransactionUsageError tue) {
+                System.out.println("Error: The update has failed.");
+            }
+
             for (int foo = 0; i < 26; i++) {
                 if (isOpen[i] == true) {
                     accounts[i].close();
@@ -276,8 +290,8 @@ public class problem2 {
     private static final int Z = constants.Z;
     private static final int numLetters = constants.numLetters;
     private static Account[] accounts;
-    private static ExecutorService e = Executors.newFixedThreadPool(26);
-//    private static ExecutorService e = Executors.newSingleThreadExecutor();
+//    private static ExecutorService e = Executors.newFixedThreadPool(26);
+    private static ExecutorService e = Executors.newSingleThreadExecutor();
 
     private static void dumpAccounts() {
         // output values:
