@@ -1,3 +1,10 @@
+/*
+ * Programming Languages Project 3
+ * Problem2.java
+ * Eric Yanulis & Tim McMullan
+ * 2012-12-07
+ */
+
 import java.io.*;
 import java.lang.Thread.*;
 import java.util.HashSet;
@@ -16,8 +23,6 @@ class TransactionUsageError extends Error {}
 class InvalidTransactionError extends Error {}
 // bad input; will have to skip this transaction
 
-// TO DO: you are not permitted to modify class Account
-//
 class Account {
     private int value = 0;
     private Thread writer = null;
@@ -48,9 +53,6 @@ class Account {
         }
     }
 
-    // TO DO: the sequential version does not call this method,
-    // but the parallel version will need to.
-    //
     public void verify(int expectedValue)
         throws TransactionAbortException {
         delay();
@@ -76,9 +78,6 @@ class Account {
         }
     }
 
-    // TO DO: the sequential version does not open anything for reading
-    // (verifying), but the parallel version will need to.
-    //
     public void open(boolean forWriting)
         throws TransactionAbortException {
         delay();
@@ -135,10 +134,6 @@ class Account {
     }
 }
 
-// TO DO: Worker is currently an ordinary class.
-// You will need to movify it to make it a task,
-// so it can be given to an Executor thread pool.
-//
 class Worker {
     private static final int A = constants.A;
     private static final int Z = constants.Z;
@@ -153,14 +148,6 @@ class Worker {
     private boolean[] isWrite = new boolean[26];
     private int[] read_cache = new int[26];
 
-    // TO DO: The sequential version of Worker peeks at accounts
-    // whenever it needs to get a value, and opens, updates, and closes
-    // an account whenever it needs to set a value.  This won't work in
-    // the parallel version.  Instead, you'll need to cache values
-    // you've read and written, and then, after figuring out everything
-    // you want to do, (1) open all accounts you need, for reading,
-    // writing, or both, (2) verify all previously peeked-at values,
-    // (3) perform all updates, and (4) close all opened accounts.
 
     public Worker(Account[] allAccounts, String trans) {
         accounts = allAccounts;
@@ -173,12 +160,6 @@ class Worker {
         }
     }
     
-    // TO DO: parseAccount currently returns a reference to an account.
-    // You probably want to change it to return a reference to an
-    // account *cache* instead.
-    //
-    //
-    //
     // parseAccount: returns numeric value account number
     private int parseAccount(String name) {
         int accountNum = (int) (name.charAt(0)) - (int) 'A';
@@ -335,7 +316,6 @@ public class problem2 {
         BufferedReader input =
             new BufferedReader(new FileReader(args[0]));
 
-        /* Begin our code */
 
         // Start all tasks
         while ((line = input.readLine()) != null) {
@@ -375,7 +355,6 @@ public class problem2 {
         }
         // All tasks completed or killed
 
-        /* end our code */
 
         System.out.println("final values:");
         dumpAccounts();
