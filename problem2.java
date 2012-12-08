@@ -298,8 +298,7 @@ public class problem2 {
     private static final int Z = constants.Z;
     private static final int numLetters = constants.numLetters;
     private static Account[] accounts;
-    private static ExecutorService e = Executors.newFixedThreadPool(26);
-//    private static ExecutorService e = Executors.newSingleThreadExecutor();
+    private static ExecutorService e = Executors.newFixedThreadPool(26); // Declared number of threads
 
     private static void dumpAccounts() {
         // output values:
@@ -327,16 +326,13 @@ public class problem2 {
         BufferedReader input =
             new BufferedReader(new FileReader(args[0]));
 
-// TO DO: you will need to create an Executor and then modify the
-// following loop to feed tasks to the executor instead of running them
-// directly.  Don't modify the initialization of accounts above, or the
-// output at the end.
+        /* Begin our code */
 
         // Start all tasks
         while ((line = input.readLine()) != null) {
             // need this to pass the line into magic internal class
             final String passLine = line;
-            // magic
+            // "magic" aka make a wrapper Runnable that calls worker.run()
             Runnable task = new Runnable() {
                 public void run() {
                     try {
@@ -358,7 +354,8 @@ public class problem2 {
         try {
             // Wait a while for existing tasks to terminate
             if (!e.awaitTermination(2,TimeUnit.MINUTES)) {
-                e.shutdownNow(); // Cancel currently executing tasks
+                // Cancel currently executing tasks if they last way too long
+                e.shutdownNow();
                 // Wait a while for tasks to respond to being cancelled
                 if (!e.awaitTermination(60, TimeUnit.SECONDS))
                     System.err.println("Error: Executor did not terminate");
@@ -367,7 +364,9 @@ public class problem2 {
             // (Re-)Cancel if current thread also interrupted
             e.shutdownNow();
         }
-        // All tasks completed
+        // All tasks completed or killed
+
+        /* end our code */
 
         System.out.println("final values:");
         dumpAccounts();
