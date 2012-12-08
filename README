@@ -2,4 +2,11 @@ Programming Languages Project 03
 Python and (concurrency in) Java
 All code by Eric Yanulis and Timothy McMullan
 
+Python:
+Version: 2.7.3
+OS: Debian Wheezy, Arch Linux
 
+Java:
+Version: Oracle Java 7 update 9
+OS: Debian Wheezy, Arch Linux
+IDE: IDE?  Vim + Make.....
