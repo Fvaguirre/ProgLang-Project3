@@ -225,6 +225,7 @@ class Worker {
                 lhs = parseAccount(words[0]);
                 // cache the current value of lhs
 
+                // try to cache the lefthand side
                 try {
                     isWrite[lhs] = true;
                     read_cache[lhs] = accounts[lhs].peek();
@@ -247,6 +248,7 @@ class Worker {
                         throw new InvalidTransactionError();
                 }
 
+                // try to open all needed files for reading/writing
                 try {
                     for (int foo = 0; i < 26; i++) {
                         if (isRead[i] == true) {
@@ -266,12 +268,14 @@ class Worker {
                 }
 //            }
 
+            // try to update the lefthand side
             try {
                 accounts[lhs].update(rhs);
             } catch (TransactionUsageError tue) {
                 System.out.println("Error: The update has failed.");
             }
 
+            // close all open files
             for (int foo = 0; i < 26; i++) {
                 if (isOpen[i] == true) {
                     accounts[i].close();
