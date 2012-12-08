@@ -249,21 +249,21 @@ class Worker {
 
                 // try to open all needed files for reading/writing
                 try {
-                    for (int foo = 0; i < 26; i++) {
-                        if (isRead[i] == true) {
-                            if (isWrite[i] == true) {
-                                accounts[i].open(true);
+                    for (int foo = 0; foo < 26; foo++) {
+                        if (isRead[foo] == true) {
+                            if (isWrite[foo] == true) {
+                                accounts[foo].open(true);
                             } else {
-                                accounts[i].open(false);
-                                accounts[i].verify(read_cache[i]);
+                                accounts[foo].open(false);
+                                accounts[foo].verify(read_cache[i]);
                             }
-                            isOpen[i] = true;
+                            isOpen[foo] = true;
                         }
                     }
                 } catch (TransactionAbortException e) {
                     transaction_abort = 1;
                      // close all open files
-                    for (int foo = 0; i < 26; i++) {
+                    for (int foo = 0; foo < 26; foo++) {
                         if (isOpen[foo] == true) {
                             accounts[foo].close();
                             isOpen[foo] = false;
@@ -283,7 +283,7 @@ class Worker {
             System.out.println("Open Files? " + isOpen[0]);
 
             // close all open files
-            for (int foo = 0; i < 26; i++) {
+            for (int foo = 0; foo < 26; foo++) {
                 System.out.println("Open Files? " + isOpen[i]);
                 if (isOpen[foo] == true) {
                     accounts[foo].close();
