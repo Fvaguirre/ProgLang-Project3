@@ -194,8 +194,8 @@ class Worker {
         if (name.charAt(0) >= '0' && name.charAt(0) <= '9') {
             rtn = new Integer(name).intValue();
         } else {
+            rtn = parseAccount(name);
             try {
-                rtn = parseAccount(name);
                 read_cache[rtn] = accounts[rtn].peek();
                 isRead[rtn] = true;
                 rtn = read_cache[rtn];
@@ -219,16 +219,15 @@ class Worker {
 
             int transaction_abort = 1;
             int rhs = 0;
-            int lhs = 0;
-//            while (transaction_abort == 1) {
+            int lhs = parseAccount(words[0]);
+            isWrite[lhs] = true;
+
+            while (transaction_abort == 1) {
                 transaction_abort = 0;
-                lhs = parseAccount(words[0]);
-                 System.out.println("LHS value = " + lhs);
                 // try to cache the lefthand side
                 try {
                     read_cache[lhs] = accounts[lhs].peek();
                     isRead[lhs] = true;
-                    isWrite[lhs] = true;
                 } catch (TransactionUsageError tue) { 
                     System.out.println("Error: peek on the lhs failed");
                 }
@@ -253,11 +252,12 @@ class Worker {
                         if (isRead[foo] == true) {
                             if (isWrite[foo] == true) {
                                 accounts[foo].open(true);
+                                isOpen[foo] = true;
                             } else {
                                 accounts[foo].open(false);
+                                isOpen[foo] = true;
                                 accounts[foo].verify(read_cache[foo]);
                             }
-                            isOpen[foo] = true;
                         }
                     }
                 } catch (TransactionAbortException e) {
@@ -269,10 +269,8 @@ class Worker {
                             isOpen[foo] = false;
                         }
                     }
-                    System.out.println("Transaction Aborts");
-                    // won't happen in sequential version
                 }
-//            }
+            }
 
             // try to update the lefthand side
             try {
@@ -283,7 +281,6 @@ class Worker {
 
             // close all open files
             for (int foo = 0; foo < 26; foo++) {
-//                System.out.println("Open Files? " + isOpen[i]);
                 if (isOpen[foo] == true) {
                     accounts[foo].close();
                     isOpen[foo] = false;
@@ -301,8 +298,8 @@ public class problem2 {
     private static final int Z = constants.Z;
     private static final int numLetters = constants.numLetters;
     private static Account[] accounts;
-//    private static ExecutorService e = Executors.newFixedThreadPool(26);
-    private static ExecutorService e = Executors.newSingleThreadExecutor();
+    private static ExecutorService e = Executors.newFixedThreadPool(26);
+//    private static ExecutorService e = Executors.newSingleThreadExecutor();
 
     private static void dumpAccounts() {
         // output values:
@@ -334,9 +331,6 @@ public class problem2 {
 // following loop to feed tasks to the executor instead of running them
 // directly.  Don't modify the initialization of accounts above, or the
 // output at the end.
-
-        System.out.println("initial values:");
-        dumpAccounts();
 
         // Start all tasks
         while ((line = input.readLine()) != null) {
