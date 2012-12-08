@@ -200,7 +200,7 @@ class Worker {
                 isRead[rtn] = true;
                 rtn = read_cache[rtn];
             } catch (TransactionUsageError tue) { 
-                System.out.println("Error: peek in parseAccountOrNum failed");
+                System.err.println("Error: peek in parseAccountOrNum failed");
             }
         }
         return rtn;
@@ -229,7 +229,7 @@ class Worker {
                     read_cache[lhs] = accounts[lhs].peek();
                     isRead[lhs] = true;
                 } catch (TransactionUsageError tue) { 
-                    System.out.println("Error: peek on the lhs failed");
+                    System.err.println("Error: peek on the lhs failed");
                 }
 
                 if (!words[1].equals("="))
@@ -276,7 +276,7 @@ class Worker {
             try {
                 accounts[lhs].update(rhs);
             } catch (TransactionUsageError tue) {
-                System.out.println("Error: The update has failed.");
+                System.err.println("Error: The update has failed.");
             }
 
             // close all open files
