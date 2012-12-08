@@ -218,7 +218,6 @@ class Worker {
             isWrite[lhs] = true;
             read_cache[lhs] = accounts[lhs].peek();
             isRead[lhs] = true;
-            System.out.println("value of LHS = " + read_cache[lhs]);
 
             if (!words[1].equals("="))
                 throw new InvalidTransactionError();
