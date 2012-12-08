@@ -278,6 +278,9 @@ public class problem2 {
 // directly.  Don't modify the initialization of accounts above, or the
 // output at the end.
 
+        System.out.println("initial values:");
+        dumpAccounts();
+
         // Start all tasks
         while ((line = input.readLine()) != null) {
             // need this to pass the line into magic internal class
