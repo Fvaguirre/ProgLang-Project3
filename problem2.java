@@ -150,7 +150,7 @@ class Worker {
     // Caches
     private boolean[] isOpen = new boolean[26];
     private boolean[] isRead = new boolean[26];
-    private int[] cache = new int[26];
+    private int[] read_cache = new int[26];
 
     // TO DO: The sequential version of Worker peeks at accounts
     // whenever it needs to get a value, and opens, updates, and closes
@@ -190,6 +190,9 @@ class Worker {
             rtn = new Integer(name).intValue();
         } else {
             rtn = parseAccount(name);
+            read_cache[rtn] = accounts[rtn].peek();
+            isRead[rtn] = true;
+            rtn = read_cache[rtn];
         }
         return rtn;
     }
@@ -207,7 +210,7 @@ class Worker {
 
             int lhs = parseAccount(words[0]);
             // cache the current value of lhs
-            cache[lhs] = accounts[lhs].peek();
+            read_cache[lhs] = accounts[lhs].peek();
             isRead[lhs] = true;
 
             if (!words[1].equals("="))
@@ -224,14 +227,13 @@ class Worker {
                     throw new InvalidTransactionError();
             }
 
-//            try {
-//                lhs.open(true);
-//            } catch (TransactionAbortException e) {t
+            try {
+                accounts[lhs].open(true);
+            } catch (TransactionAbortException e) {
                 // won't happen in sequential version
-//            }
-
-//            lhs.update(rhs);
-//            lhs.close();
+            }
+            accounts[lhs].update(rhs);
+            accounts[lhs].close();
         }
 
         System.out.println("commit: " + transaction);
