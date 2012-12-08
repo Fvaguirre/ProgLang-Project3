@@ -255,7 +255,7 @@ class Worker {
                                 accounts[foo].open(true);
                             } else {
                                 accounts[foo].open(false);
-                                accounts[foo].verify(read_cache[i]);
+                                accounts[foo].verify(read_cache[foo]);
                             }
                             isOpen[foo] = true;
                         }
