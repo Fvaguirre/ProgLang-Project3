@@ -165,7 +165,7 @@ class Worker {
     public Worker(Account[] allAccounts, String trans) {
         accounts = allAccounts;
         transaction = trans;
-        for (int i = 0; i < 26; i++) {
+        for (int i = 0; i < 26; i++) {  //normalize state of all accounts
             isRead[i] = false;
             isOpen[i] = false;
             isWrite[i] = false;
@@ -177,6 +177,9 @@ class Worker {
     // You probably want to change it to return a reference to an
     // account *cache* instead.
     //
+    //
+    //
+    // parseAccount: returns numeric value account number
     private int parseAccount(String name) {
         int accountNum = (int) (name.charAt(0)) - (int) 'A';
         if (accountNum < A || accountNum > Z)
@@ -188,7 +191,10 @@ class Worker {
         }
         return accountNum;
     }
+    
 
+    //parseAccountOrNum: returns number if number, or sets read flag
+    //and returns cached account value
     private int parseAccountOrNum(String name) {
         int rtn = 0;
         if (name.charAt(0) >= '0' && name.charAt(0) <= '9') {
@@ -206,25 +212,28 @@ class Worker {
         return rtn;
     }
 
+
+    //wooooo runnable
     public void run() {
         // tokenize transaction
         String[] commands = transaction.split(";");
 
         for (int i = 0; i < commands.length; i++) {
-
+            //Milanova magic...?
             String[] words = commands[i].trim().split("\\s");
 
+            //complain if the transaction syntax is wrong
             if (words.length < 3)
                 throw new InvalidTransactionError();
 
-            int transaction_abort = 1;
-            int rhs = 0;
-            int lhs = parseAccount(words[0]);
-            isWrite[lhs] = true;
+            int transaction_abort = 1;          //transaction abort flag
+            int rhs = 0;                        //initialize to safe value
+            int lhs = parseAccount(words[0]);   //lhs is the acct to be modified
+            isWrite[lhs] = true;                //...so we flag it as writable
 
             while (transaction_abort == 1) {
                 transaction_abort = 0;
-                // try to cache the lefthand side
+                // try to cache the lefthand side by peeking & flagging as readable
                 try {
                     read_cache[lhs] = accounts[lhs].peek();
                     isRead[lhs] = true;
@@ -232,12 +241,12 @@ class Worker {
                     System.err.println("Error: peek on the lhs failed");
                 }
 
-                if (!words[1].equals("="))
+                if (!words[1].equals("="))      //more checking for invalid transaction syntax
                     throw new InvalidTransactionError();
 
-                rhs = parseAccountOrNum(words[2]);
+                rhs = parseAccountOrNum(words[2]);      //grab the first account after the =
 
-                for (int j = 3; j < words.length; j+=2) {
+                for (int j = 3; j < words.length; j+=2) {   //set rhs depending on the operation
                     if (words[j].equals("+"))
                         rhs += parseAccountOrNum(words[j+1]);
                     else if (words[j].equals("-"))
@@ -248,7 +257,7 @@ class Worker {
 
                 // try to open all needed files for reading/writing
                 try {
-                    for (int foo = 0; foo < 26; foo++) {
+                    for (int foo = 0; foo < 26; foo++) {    //check for read flags & open needed accts
                         if (isRead[foo] == true) {
                             if (isWrite[foo] == true) {
                                 accounts[foo].open(true);
@@ -260,7 +269,7 @@ class Worker {
                             }
                         }
                     }
-                } catch (TransactionAbortException e) {
+                } catch (TransactionAbortException e) { //if we mess up, close all accounts
                     transaction_abort = 1;
                      // close all open files
                     for (int foo = 0; foo < 26; foo++) {
@@ -272,7 +281,7 @@ class Worker {
                 }
             }
 
-            // try to update the lefthand side
+            // try to update the lefthand side - write our calculated value to LHS
             try {
                 accounts[lhs].update(rhs);
             } catch (TransactionUsageError tue) {
