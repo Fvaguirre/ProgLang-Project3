@@ -150,6 +150,7 @@ class Worker {
     // Caches
     private boolean[] isOpen = new boolean[26];
     private boolean[] isRead = new boolean[26];
+    private boolean[] isWrite = new boolean[26];
     private int[] read_cache = new int[26];
 
     // TO DO: The sequential version of Worker peeks at accounts
@@ -164,6 +165,12 @@ class Worker {
     public Worker(Account[] allAccounts, String trans) {
         accounts = allAccounts;
         transaction = trans;
+        for (int i = 0; i < 26; i++) {
+            isRead[i] = false;
+            isOpen[i] = false;
+            isWrite[i] = false;
+            read_cache[i] = 0;
+        }
     }
     
     // TO DO: parseAccount currently returns a reference to an account.
@@ -174,12 +181,10 @@ class Worker {
         int accountNum = (int) (name.charAt(0)) - (int) 'A';
         if (accountNum < A || accountNum > Z)
             throw new InvalidTransactionError();
-//        Account a = accounts[accountNum];
         for (int i = 1; i < name.length(); i++) {
             if (name.charAt(i) != '*')
                 throw new InvalidTransactionError();
             accountNum = (accounts[accountNum].peek() % numLetters);
-//            a = accounts[accountNum];
         }
         return accountNum;
     }
@@ -210,8 +215,10 @@ class Worker {
 
             int lhs = parseAccount(words[0]);
             // cache the current value of lhs
+            isWrite[lhs] = true;
             read_cache[lhs] = accounts[lhs].peek();
             isRead[lhs] = true;
+            System.out.println("value of LHS = " + read_cache[lhs]);
 
             if (!words[1].equals("="))
                 throw new InvalidTransactionError();
@@ -228,12 +235,29 @@ class Worker {
             }
 
             try {
-                accounts[lhs].open(true);
+                for (int foo = 0; i < 26; i++) {
+                    if (isRead[i] == true) {
+                        if (isWrite[i] == true) {
+                            accounts[i].open(true);
+                        } else {
+                            accounts[i].open(false);
+                            accounts[i].verify(read_cache[i]);
+                        }
+                        isOpen[i] = true;
+                    }
+                }
             } catch (TransactionAbortException e) {
+                System.out.println("Transaction Aborts");
                 // won't happen in sequential version
             }
             accounts[lhs].update(rhs);
-            accounts[lhs].close();
+            for (int foo = 0; i < 26; i++) {
+                if (isOpen[i] == true) {
+                    accounts[i].close();
+                    isOpen[i] = false;
+                    isWrite[i] = false;
+                }
+            }
         }
 
         System.out.println("commit: " + transaction);
@@ -245,7 +269,8 @@ public class problem2 {
     private static final int Z = constants.Z;
     private static final int numLetters = constants.numLetters;
     private static Account[] accounts;
-    private static ExecutorService e = Executors.newSingleThreadExecutor();
+    private static ExecutorService e = Executors.newFixedThreadPool(26);
+//    private static ExecutorService e = Executors.newSingleThreadExecutor();
 
     private static void dumpAccounts() {
         // output values:
