@@ -223,13 +223,12 @@ class Worker {
 //            while (transaction_abort == 1) {
                 transaction_abort = 0;
                 lhs = parseAccount(words[0]);
-                // cache the current value of lhs
-
+                 System.out.println("LHS value = " + lhs);
                 // try to cache the lefthand side
                 try {
-                    isWrite[lhs] = true;
                     read_cache[lhs] = accounts[lhs].peek();
                     isRead[lhs] = true;
+                    isWrite[lhs] = true;
                 } catch (TransactionUsageError tue) { 
                     System.out.println("Error: peek on the lhs failed");
                 }
@@ -265,9 +264,9 @@ class Worker {
                     transaction_abort = 1;
                      // close all open files
                     for (int foo = 0; i < 26; i++) {
-                        if (isOpen[i] == true) {
-                            accounts[i].close();
-                            isOpen[i] = false;
+                        if (isOpen[foo] == true) {
+                            accounts[foo].close();
+                            isOpen[foo] = false;
                         }
                     }
                     System.out.println("Transaction Aborts");
@@ -281,15 +280,18 @@ class Worker {
             } catch (TransactionUsageError tue) {
                 System.out.println("Error: The update has failed.");
             }
+            System.out.println("Open Files? " + isOpen[0]);
 
             // close all open files
             for (int foo = 0; i < 26; i++) {
-                if (isOpen[i] == true) {
-                    accounts[i].close();
-                    isOpen[i] = false;
-                    isWrite[i] = false;
+                System.out.println("Open Files? " + isOpen[i]);
+                if (isOpen[foo] == true) {
+                    accounts[foo].close();
+                    isOpen[foo] = false;
+                    isWrite[foo] = false;
                 }
             }
+            System.out.println("Open Files? " + isOpen[0]);
         }
 
         System.out.println("commit: " + transaction);
